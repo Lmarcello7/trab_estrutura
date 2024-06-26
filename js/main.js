@@ -47,41 +47,47 @@ $(document).ready(function () {
 });
 
 function addRows() {
-	$.ajax({
-		url: '../trab/api/api.php',
-		type: 'POST',
-		dataType: 'json',
-		data: { function: 'getProdCadastrado' },
-		success: function (data) {
-			let alert = $('#alert');
-			if (data.length > 0) {
-				let table = $('#tableProd > tbody'),
-					tr = '';
-				$.each(data, function (index, valor) {
-					tr += `<tr>`;
-					tr += `<td>${valor.cod}</td>`;
-					tr += `<td>${valor.prod}</td>`;
-					tr += `<td>${valor.qtd}</td>`;
-					tr += `<td class="align-middle text-center"><button type="button" class="btn btn-sm alert-warning" onclick="editRow(${index})"><i class="fa fa-pencil-square-o"></i></button><button type="button" class="btn btn-sm alert-danger ml-1" onclick="delRow(${index})"><i class="fa fa-trash"></i></i></button></td>`;
-					tr += `</tr>`;
-				});
+	let busca = $('#busca').val().trim();
 
-				if (table.find('tr').length > 0) {
-					table.find('tr').remove();
+	if(busca == '') {
+		$.ajax({
+			url: '../trab/api/api.php',
+			type: 'POST',
+			dataType: 'json',
+			data: { function: 'getProdCadastrado' },
+			success: function (data) {
+				let alert = $('#alert');
+				if (data.length > 0) {
+					let table = $('#tableProd > tbody'),
+						tr = '';
+					$.each(data, function (index, valor) {
+						tr += `<tr>`;
+						tr += `<td>${valor.cod}</td>`;
+						tr += `<td>${valor.prod}</td>`;
+						tr += `<td>${valor.qtd}</td>`;
+						tr += `<td class="align-middle text-center"><button type="button" class="btn btn-sm alert-warning" onclick="editRow(${index})"><i class="fa fa-pencil-square-o"></i></button><button type="button" class="btn btn-sm alert-danger ml-1" onclick="delRow(${index})"><i class="fa fa-trash"></i></i></button></td>`;
+						tr += `</tr>`;
+					});
+	
+					if (table.find('tr').length > 0) {
+						table.find('tr').remove();
+					}
+	
+					if($('#tableProd').hasClass('d-none')) {
+						$('#tableProd').removeClass('d-none');
+						alert.addClass('d-none');
+					}
+	
+					table.append(tr);
+				} else {
+					alert.removeClass('d-none');
+					$('#tableProd').addClass('d-none');
 				}
-
-				if($('#tableProd').hasClass('d-none')) {
-					$('#tableProd').removeClass('d-none');
-					alert.addClass('d-none');
-				}
-
-				table.append(tr);
-			} else {
-				alert.removeClass('d-none');
-				$('#tableProd').addClass('d-none');
 			}
-		}
-	});
+		});
+	} else {
+		buscar();
+	}
 }
 
 function delRow(key) {
@@ -154,9 +160,16 @@ function debounce(func, wait) {
 }
 
 function buscar() {
+	var busca = $('#busca').val().trim();
+
 	var params = {
-        prod: $('#busca').val()
+        prod: busca
     };
+
+	if(busca == '') {
+		addRows();
+		return;
+	}
 
 	$.ajax({
 		url: '../trab/api/api.php',
@@ -167,7 +180,24 @@ function buscar() {
 			arrData: JSON.stringify(params)
 		},
 		success: function (data) {
-			console.log(data);
+			if(data.length > 0) {
+				let table = $('#tableProd > tbody'),
+                    tr = '';
+                $.each(data, function (index, valor) {
+                    tr += `<tr>`;
+                    tr += `<td>${valor.cod}</td>`;
+                    tr += `<td>${valor.prod}</td>`;
+                    tr += `<td>${valor.qtd}</td>`;
+                    tr += `<td class="align-middle text-center"><button type="button" class="btn btn-sm alert-warning" onclick="editRow(${valor.key})"><i class="fa fa-pencil-square-o"></i></button><button type="button" class="btn btn-sm alert-danger ml-1" onclick="delRow(${valor.key})"><i class="fa fa-trash"></i></button></td>`;
+                    tr += `</tr>`;
+                });
+
+				if (table.find('tr').length > 0) {
+					table.find('tr').remove();
+				}
+				
+				table.append(tr);
+			}
 		},
 	});
 }

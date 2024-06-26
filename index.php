@@ -35,18 +35,19 @@
                     <div class="col-6 text-center">
                         <h5 class="mt-2">Loja do Seu Zé</h5>
                     </div>
-                    <div class="col-1"></div>
-                    <div class="col-2 text-right mt-1">
-                        <button type="button" class="btn btn-sm alert-success" id="btnCadProd">
-                            <i class="fa fa-plus" aria-hidden="true"></i> Cadastrar Produto
-                        </button>
-                    </div>
+                    <div class="col-3"></div>
                 </div>
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-7 m-auto">
+                    <div class="col-10">
                         <input type="text" name="busca" id="busca" class="form-control form-control-sm" placeholder="Pesquise por Código ou Produtos">
+                    </div>
+                    <!-- <div class="col-3"></div> -->
+                    <div class="col-2 text-right">
+                        <button type="button" class="btn btn-sm alert-success" id="btnCadProd">
+                            <i class="fa fa-plus" aria-hidden="true"></i> Cadastrar Produto
+                        </button>
                     </div>
                 </div>
                 <hr>
