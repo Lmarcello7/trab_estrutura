@@ -1,0 +1,14 @@
+/* CONFIGURAÇÃO MODAL */
+.modal-dialog {
+    max-width: 65% !important;
+}
+
+.modal-header {
+    background-color: white !important;
+    color: black;
+}
+
+#alertModal .modal-dialog, #confirmModal .modal-dialog {
+    max-width: 30% !important;
+}
+/************************/

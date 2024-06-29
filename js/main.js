@@ -1,13 +1,14 @@
 $(document).ready(function () {
 	addRows();
-
+	
 	$('#busca').on('input', debounce(buscar, 300));
 
 	$('#btnCadProd').click(function () {
 		BootstrapDialog.show({
 			title: '<h4 class="text-dark">Cadastro de Produtos</h4>',
 			message: function (dialog) {
-				return $('<div></div>').load('modalCadEdit.php')
+				var loading = '<div id="divLoad" class="text-center"><i class="fa fa-spinner fa-spin fa-3x" aria-hidden="true"></i><br><b>Carregando</b></div>';
+				return $(`<div>${loading}</div>`).load('modalCadEdit.php')
 			},
 			buttons: [{
 				label: 'Fechar',
@@ -20,10 +21,18 @@ $(document).ready(function () {
 				label: 'Salvar',
 				cssClass: 'btn-success btn-size-4 mr-02 text-center',
 				action: function (dialog) {
+					let prod = $('#prod').val().trim(),
+						qtd = $('#qtd').val();
+
+					if(prod == '' || qtd == '') {
+						alertModal('Preencha todos os campos!');
+                        return false;
+					}
+
 					var params = {
 						cod: $('#cod').val(),
-						prod: $('#prod').val().trim(),
-						qtd: $('#qtd').val()
+						prod: prod,
+						qtd: qtd
 					};
 
 					$.ajax({
@@ -36,8 +45,8 @@ $(document).ready(function () {
 						},
 						success: function () {
 							dialog.close();
-							alert('Produto Cadastrado com Sucesso!');
 							addRows();
+							alertModal('Produto Cadastrado com Sucesso!');
 						},
 					});
 				}
@@ -91,28 +100,40 @@ function addRows() {
 }
 
 function delRow(key) {
-	if (confirm('Deseja Apagar o produto Selecionado? Essa ação não poderá ser desfeita!')) {
-		$.ajax({
-			url: '../trab/api/api.php',
-			type: 'POST',
-			dataType: 'json',
-			data: {
-				function: 'deletProd',
-				arrData: JSON.stringify({ rec: key })
-			},
-			success: function () {
-				alert('Produto Apagado com Sucesso!');
-				addRows();
-			},
-		});
-	}
+	confirmModal('Deseja Apagar o produto Selecionado? Essa ação não poderá ser desfeita!', delRowAjax, key);
 }
 
+function delRowAjax(rec) {
+	$.ajax({
+		url: '../trab/api/api.php',
+		type: 'POST',
+		dataType: 'json',
+		data: {
+			function: 'deletProd',
+			arrData: JSON.stringify({ rec: rec })
+		},
+		success: function () {
+			var table = $('#tableProd > tbody > tr');
+			alertModal('Produto Deletado com Sucesso!');
+			addRows();
+
+			if(table.length == 1) {
+				$('#tableProd').addClass('d-none');
+				$('#alert').removeClass('d-none');
+			} else {
+				$('#tableProd').removeClass('d-none');
+				$('#alert').addClass('d-none');
+			}
+		},
+	});
+}
+ 
 function editRow(key) {
 	BootstrapDialog.show({
 		title: '<h4 class="text-dark">Editar Produto</h4>',
 		message: function (dialog) {
-			return $('<div></div>').load('modalCadEdit.php', { rec: key })
+			var loading = '<div id="divLoad" class="text-center"><i class="fa fa-spinner fa-spin fa-3x" aria-hidden="true"></i><br><b>Carregando</b></div>';
+			return $(`<div>${loading}</div>`).load('modalCadEdit.php', { rec: key })
 		},
 		buttons: [{
 			label: 'Fechar',
@@ -141,10 +162,71 @@ function editRow(key) {
 					},
 					success: function () {
 						dialog.close();
-						alert('Produto Editado com Sucesso!');
+						alertModal('Produto Editado com Sucesso!');
 						addRows();
 					},
 				});
+			}
+		}]
+	});
+}
+function alertModal(message){
+	BootstrapDialog.show({
+		title: 'ATENÇÃO!',
+		id: 'alertModal',
+		type: BootstrapDialog.TYPE_DEFAULT,
+		closable: false,
+		message: function(dialog) {
+			var $content = $('<div><b>'+message+'</b></div>');
+			return $content;
+		},
+		buttons: [{
+			id: 'btn-confirm',
+			label: 'Ok',
+			cssClass: 'btn-primary btn-size-3',
+			autospin: false,
+			action: function(dialog) {
+				dialog.close();
+			}
+		}]
+	});
+}
+
+function confirmModal(message, functionY = '', paramsY = '', functionN = '', paramsN = '') {
+	BootstrapDialog.show({
+		title: 'ATENÇÃO!',
+		id: 'confirmModal',
+		type: BootstrapDialog.TYPE_DEFAULT,
+		closable: false,
+		message: function(dialog) {
+			var $content = $('<div><b>'+message+'</b></div>');
+			return $content;
+		},
+		buttons: [{
+			id: 'btn-yes',
+			icon: 'fa fa-check-circle',
+			label: ' Sim',
+			cssClass: 'btn-success btn-size-3 mr-2',
+			autospin: false,
+			action: function(dialog) {
+				$(this).prop('disabled', true);
+
+				if ($.trim(functionY) != '') {
+					functionY.call(this, paramsY);
+				}
+				dialog.close();
+			}
+		},{
+			id: 'btn-no',
+			icon: 'fa fa-ban',
+			label: ' Não',
+			cssClass: 'btn-danger btn-size-3',
+			autospin: false,
+			action: function(dialog) {
+				if ($.trim(functionN) != '') {
+					functionN.call(this, paramsN);
+				}
+				dialog.close();
 			}
 		}]
 	});

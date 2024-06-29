@@ -13,16 +13,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://cdn.jsdelivr.net/gh/GedMarc/bootstrap4-dialog/dist/css/bootstrap-dialog.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="style/style.css">
-	<style>
-		.modal-dialog {
-            max-width: 65% !important;
-        }
-
-        .modal-header {
-            background-color: white !important;
-            color: black;
-        }
-	</style>
 </head>
 <body>
     <div class="container mt-3">
